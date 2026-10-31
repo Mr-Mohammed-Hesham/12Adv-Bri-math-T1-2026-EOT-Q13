@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📐 Chain Rule & Composite Functions - رياضيات 12 متقدم | Mr. Mohammed Hesham</title>
+<meta name="description" content="امتحان تفاعلي عن قاعدة السلسلة ومشتقات الدوال المركبة - رياضيات 12 متقدم">
+<meta name="author" content="Mr. Mohammed Hesham">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+body.en-mode { font-family: 'Inter', sans-serif; }
+.arabic-math { font-family: 'Amiri', 'Cairo', serif; }
+.correct { background-color: #dcfce7 !important; border-color: #16a34a !important; }
+.incorrect { background-color: #fee2e2 !important; border-color: #dc2626 !important; }
+.timer-warning { color: #dc2626 !important; animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: 0.7; } }
+@media print { .no-print { display: none !important; } }
+.success-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.875rem; }
+.grade-excellent { background: #dcfce7; color: #166534; }
+.grade-good { background: #fef3c7; color: #92400e; }
+.grade-pass { background: #dbeafe; color: #1e40af; }
+.grade-fail { background: #fee2e2; color: #991b1b; }
+.lang-switch { position: fixed; top: 16px; left: 16px; z-index: 100; background: white; padding: 6px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: flex; gap: 4px; border: 2px solid #d97706; }
+[dir="ltr"] .lang-switch { left: auto; right: 16px; }
+.lang-btn { padding: 6px 14px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s; border: none; font-size: 0.875rem; background: transparent; color: #6b7280; }
+.lang-btn.active { background: #d97706; color: white; box-shadow: 0 2px 6px rgba(217,119,6,0.4); }
+.shuffle-badge { display: inline-block; background: linear-gradient(135deg, #d97706, #b45309); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-right: 8px; }
+.math-display { display: inline-block; direction: ltr; font-family: 'Amiri', serif; font-size: 1.2em; padding: 2px 8px; background: #fef3c7; border-radius: 6px; margin: 2px; color: #92400e; font-weight: 600; }
+.save-indicator { position: fixed; bottom: 20px; left: 20px; z-index: 200; background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.save-indicator.show { opacity: 1; }
+.formula-box { background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 12px; margin: 10px 0; font-family: 'Amiri', serif; direction: ltr; text-align: center; }
+.svg-graph { display: block; margin: 12px auto; background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 8px; }
+.graph-container { text-align: center; margin: 10px 0; }
+.module-badge { display: inline-block; padding: 4px 16px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; margin-bottom: 8px; }
+.module-1 { background: #fef3c7; color: #92400e; }
+.module-2 { background: #dbeafe; color: #1e40af; }
+.module-3 { background: #fce7f3; color: #9f1239; }
+.module-4 { background: #ecfdf5; color: #065f46; }
+.module-5 { background: #ede9fe; color: #5b21b6; }
+.module-6 { background: #fee2e2; color: #991b1b; }
+</style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+
+<div class="lang-switch no-print">
+<button class="lang-btn active" onclick="setLanguage('ar')" id="btn-ar">عربي</button>
+<button class="lang-btn" onclick="setLanguage('en')" id="btn-en">EN</button>
+</div>
+
+<div id="saveIndicator" class="save-indicator">💾 <span data-ar="تم الحفظ" data-en="Saved">تم الحفظ</span></div>
+
+<div id="timer-container" class="max-w-5xl mx-auto mb-4 text-center no-print">
+<div class="bg-white p-4 rounded-2xl shadow-lg inline-block border-2 border-amber-100">
+<span class="text-gray-600 ml-2">⏰ الوقت المتبقي:</span>
+<span id="timer" class="text-2xl font-bold text-amber-700 font-mono">60:00</span>
+<span class="shuffle-badge">📐 Chain Rule Exam - 30 سؤال</span>
+</div>
+</div>
+
+<div class="max-w-5xl mx-auto mb-6 flex flex-wrap gap-3 justify-center no-print">
+<button onclick="toggleAnswers()" class="bg-amber-700 hover:bg-amber-800 text-white px-5 py-2 rounded-xl font-medium transition shadow">👀 إظهار/إخفاء الإجابات</button>
+<button onclick="window.print()" class="bg-gray-700 hover:bg-gray-900 text-white px-5 py-2 rounded-xl font-medium transition shadow">🖨️ طباعة</button>
+<button onclick="reshuffleExam()" class="bg-gradient-to-r from-amber-700 to-orange-600 hover:from-amber-800 hover:to-orange-700 text-white px-5 py-2 rounded-xl font-medium transition shadow">🔄 أسئلة جديدة</button>
+<button onclick="clearProgress()" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-medium transition shadow">🗑️ مسح التقدم</button>
+</div>
+
+<header class="max-w-5xl mx-auto bg-white p-8 rounded-3xl shadow-2xl mb-8 border-4 border-amber-500">
+<div class="text-center">
+<div class="inline-block bg-amber-700 text-white px-6 py-2 rounded-full text-sm font-bold mb-4">MATH 12 ADVANCED - QUESTION 13</div>
+<h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">📐 قاعدة السلسلة ومشتقات الدوال المركبة</h1>
+<h2 class="text-xl text-amber-700 font-semibold mb-2">رياضيات 12 متقدم - تمارين 31-38</h2>
+<p class="text-gray-600 mb-4">Chain Rule, Even/Odd Functions & Composite Derivatives</p>
+<p class="text-sm text-green-600 font-semibold">💾 يتم حفظ تقدمك تلقائياً - 30 سؤالاً في 6 أقسام</p>
+</div>
+<div class="mt-6 flex flex-wrap justify-center gap-4 text-sm text-gray-600">
+<span>📅 التاريخ: <input type="text" id="examDate" class="border-b-2 border-amber-300 bg-transparent w-32 text-center"></span>
+<span>😊 الاسم: <input type="text" id="studentName" class="border-b-2 border-amber-300 bg-transparent w-40 text-center" placeholder="اكتب اسمك"></span>
+<span>🏫 الشعبة: <input type="text" id="studentClass" class="border-b-2 border-amber-300 bg-transparent w-32 text-center" placeholder="الشعبة"></span>
+<span>⏰ المدة: 60 دقيقة</span>
+<span>📊 المجموع: 100 درجة</span>
+</div>
+</header>
+
+<div class="max-w-5xl mx-auto mb-6 bg-white p-4 rounded-xl shadow-lg border-2 border-amber-200 no-print">
+<h3 class="font-bold text-lg mb-3 text-amber-800 text-center">📐 القوانين الأساسية</h3>
+<div class="grid md:grid-cols-3 gap-3 text-sm">
+<div class="formula-box"><strong>Chain Rule:</strong><br>[f(g(x))]' = f'(g(x))·g'(x)</div>
+<div class="formula-box"><strong>Even Function:</strong><br>f(-x) = f(x) → f' is odd</div>
+<div class="formula-box"><strong>Odd Function:</strong><br>f(-x) = -f(x) → f' is even</div>
+<div class="formula-box"><strong>[f(x)]ⁿ' = n[f(x)]ⁿ⁻¹·f'(x)</strong></div>
+<div class="formula-box"><strong>f(g(x))' = f'(g(x))·g'(x)</strong></div>
+<div class="formula-box"><strong>√f(x)' = f'(x)/(2√f(x))</strong></div>
+</div>
+</div>
+
+<main class="max-w-5xl mx-auto space-y-8" id="exam-content"></main>
+
+<div class="text-center no-print pb-8 mt-8">
+<button onclick="gradeExam()" class="bg-gradient-to-r from-amber-700 to-orange-600 hover:from-amber-800 hover:to-orange-700 text-white text-lg px-12 py-4 rounded-2xl font-bold shadow-xl transition transform hover:scale-105">🎯 صحح إجاباتي!</button>
+</div>
+
+<div id="results-panel" class="max-w-5xl mx-auto mt-8 bg-white p-8 rounded-3xl shadow-2xl border-4 border-amber-500 hidden no-print">
+<h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">🏆 نتيجتك يا بطل! 🏆</h2>
+<div class="grid md:grid-cols-3 gap-4 mb-6">
+<div class="bg-amber-50 p-4 rounded-xl text-center"><p>😊 الاسم</p><p id="res-name" class="font-bold text-xl text-amber-700">-</p></div>
+<div class="bg-orange-50 p-4 rounded-xl text-center"><p>📅 التاريخ</p><p id="res-date" class="font-bold text-xl text-orange-700">-</p></div>
+<div class="bg-amber-50 p-4 rounded-xl text-center"><p>🌟 المجموع</p><p id="res-total" class="font-bold text-3xl text-amber-700">0 / 100</p></div>
+</div>
+<div class="text-center mb-6">
+<span id="success-badge" class="success-badge grade-excellent">-</span>
+<p id="success-percent" class="text-4xl font-bold text-amber-700 mt-2">0%</p>
+<p class="text-sm text-gray-500">نسبة النجاح</p>
+</div>
+<div class="bg-gray-50 p-6 rounded-xl mb-6">
+<h3 class="font-bold text-lg mb-4 text-gray-800">📊 أدائك في كل قسم:</h3>
+<div class="space-y-3" id="sections-performance"></div>
+</div>
+<div class="text-center">
+<button id="sendEmailBtn" onclick="sendResultsToEmail()" class="bg-gradient-to-r from-amber-700 to-orange-600 text-white text-lg px-8 py-3 rounded-2xl font-bold shadow-xl transition">📧 أرسل النتيجة للمعلم</button>
+<p id="emailStatus" class="text-sm mt-2 text-center font-medium"></p>
+</div>
+</div>
+
+<footer class="max-w-5xl mx-auto mt-10 mb-8 text-center text-gray-500 text-sm no-print">
+© Chain Rule & Composite Functions - Grade 12 Advanced | Mr. Mohammed Hesham 📐
+</footer>
+
+<script>
+const PUBLIC_KEY = "Rb3Lq8tXaFmc5YHUH";
+const SERVICE_ID = "service_w15m64i";
+const TEMPLATE_ID = "template_5b0u2tq";
+const TARGET_EMAIL = "mohammedhesham872@gmail.com";
+emailjs.init(PUBLIC_KEY);
+
+const STORAGE_KEY = 'chain_rule_grade12_v1';
+const TOTAL_TIME = 3600;
+const TOTAL_QUESTIONS = 30;
+const TOTAL_SECTIONS = 6;
+const QUESTIONS_PER_SECTION = 5;
+
+let currentSeed = null;
+let answersVisible = false;
+let saveIndicatorTimeout = null;
+let currentLang = 'ar';
+let timeRemaining = TOTAL_TIME;
+let timerInterval;
+let examData;
+let correctAnswersMap = {};
+let rng = null;
+
+function mulberry32(a) {
+    return function() {
+        var t = a += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+}
+
+function showSaveIndicator() {
+    const indicator = document.getElementById('saveIndicator');
+    indicator.classList.add('show');
+    if (saveIndicatorTimeout) clearTimeout(saveIndicatorTimeout);
+    saveIndicatorTimeout = setTimeout(() => indicator.classList.remove('show'), 1500);
+}
+
+function saveState(showIndicator = true) {
+    try {
+        const state = {
+            seed: currentSeed, lang: currentLang,
+            studentName: document.getElementById('studentName').value,
+            studentClass: document.getElementById('studentClass').value,
+            examDate: document.getElementById('examDate').value,
+            answers: getSelectedAnswers(),
+            timeRemaining: timeRemaining,
+            answersVisible: answersVisible, savedAt: Date.now()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if (showIndicator) showSaveIndicator();
+    } catch (e) { console.error('Save error:', e); }
+}
+
+function loadState() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : null;
+    } catch (e) { return null; }
+}
+
+function getSelectedAnswers() {
+    const answers = {};
+    for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+        const selected = document.querySelector('input[name="q'+i+'"]:checked');
+        if (selected) answers[i] = selected.value;
+    }
+    return answers;
+}
+
+function restoreAnswers(answers) {
+    if (!answers) return;
+    for (const [idx, val] of Object.entries(answers)) {
+        const radio = document.querySelector('input[name="q'+idx+'"][value="'+val+'"]');
+        if (radio) radio.checked = true;
+    }
+}
+
+function clearProgress() {
+    const msg = currentLang === 'ar' ? '⚠️ هل أنت متأكد من مسح كل التقدم؟' : '⚠️ Clear all progress?';
+    if (confirm(msg)) { localStorage.removeItem(STORAGE_KEY); location.reload(); }
+}
+
+function setupAnswerListeners() {
+    document.getElementById('exam-content').addEventListener('change', (e) => {
+        if (e.target.type === 'radio') saveState();
+    });
+}
+
+function setupInputListeners() {
+    ['studentName', 'studentClass', 'examDate'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', () => saveState(false));
+            el.addEventListener('blur', () => saveState());
+        }
+    });
+}
+
+// ==================== SVG DIAGRAMS ====================
+const svgGraphs = {
+    chain_rule: `<svg class="svg-graph" width="400" height="240" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="230" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+        <text x="200" y="25" text-anchor="middle" font-size="14" fill="#92400e" font-weight="bold">⛓️ قاعدة السلسلة - Chain Rule</text>
+        <rect x="30" y="50" width="160" height="60" rx="8" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>
+        <text x="110" y="75" text-anchor="middle" font-size="12" fill="#92400e" font-weight="bold">Outer: f(u)</text>
+        <text x="110" y="95" text-anchor="middle" font-size="11" fill="#92400e">u = g(x)</text>
+        <rect x="210" y="50" width="160" height="60" rx="8" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>
+        <text x="290" y="75" text-anchor="middle" font-size="12" fill="#92400e" font-weight="bold">Inner: g(x)</text>
+        <text x="290" y="95" text-anchor="middle" font-size="11" fill="#92400e">h(x) = f(g(x))</text>
+        <rect x="30" y="130" width="340" height="50" rx="8" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>
+        <text x="200" y="155" text-anchor="middle" font-size="13" fill="#92400e" font-family="'Amiri', serif" font-weight="bold">h'(x) = f'(g(x)) · g'(x)</text>
+        <rect x="30" y="190" width="340" height="35" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+        <text x="200" y="213" text-anchor="middle" font-size="11" fill="#92400e">Derivative of outer × Derivative of inner</text>
+    </svg>`,
+    
+    even_odd_functions: `<svg class="svg-graph" width="400" height="260" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="250" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+        <text x="200" y="25" text-anchor="middle" font-size="14" fill="#1e40af" font-weight="bold">🔷 الدوال الزوجية والفردية</text>
+        <rect x="20" y="45" width="170" height="90" rx="6" fill="#bfdbfe" stroke="#2563eb" stroke-width="2"/>
+        <text x="105" y="65" text-anchor="middle" font-size="12" fill="#1e40af" font-weight="bold">Even Function (زوجية)</text>
+        <text x="105" y="85" text-anchor="middle" font-size="11" fill="#1e40af">f(-x) = f(x)</text>
+        <text x="105" y="105" text-anchor="middle" font-size="10" fill="#1e40af">Symmetric about y-axis</text>
+        <text x="105" y="125" text-anchor="middle" font-size="10" fill="#1e40af">Derivative is ODD</text>
+        <rect x="210" y="45" width="170" height="90" rx="6" fill="#bfdbfe" stroke="#2563eb" stroke-width="2"/>
+        <text x="295" y="65" text-anchor="middle" font-size="12" fill="#1e40af" font-weight="bold">Odd Function (فردية)</text>
+        <text x="295" y="85" text-anchor="middle" font-size="11" fill="#1e40af">f(-x) = -f(x)</text>
+        <text x="295" y="105" text-anchor="middle" font-size="10" fill="#1e40af">Symmetric about origin</text>
+        <text x="295" y="125" text-anchor="middle" font-size="10" fill="#1e40af">Derivative is EVEN</text>
+        <rect x="20" y="150" width="360" height="90" rx="6" fill="#bfdbfe" stroke="#2563eb" stroke-width="2"/>
+        <text x="200" y="175" text-anchor="middle" font-size="12" fill="#1e40af" font-weight="bold">Key Properties:</text>
+        <text x="200" y="195" text-anchor="middle" font-size="11" fill="#1e40af">• Even' = Odd, Odd' = Even</text>
+        <text x="200" y="215" text-anchor="middle" font-size="11" fill="#1e40af">• If f is even and symmetric about x=a, then f'(a) = 0</text>
+        <text x="200" y="235" text-anchor="middle" font-size="10" fill="#1e40af">• Tangent at symmetry point is horizontal</text>
+    </svg>`,
+    
+    composite_derivatives: `<svg class="svg-graph" width="400" height="280" viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="270" rx="12" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+        <text x="200" y="25" text-anchor="middle" font-size="14" fill="#9f1239" font-weight="bold">🔢 مشتقات دوال مركبة</text>
+        <rect x="20" y="45" width="360" height="35" rx="6" fill="#fbcfe8" stroke="#ec4899" stroke-width="2"/>
+        <text x="200" y="68" text-anchor="middle" font-size="11" fill="#9f1239" font-family="'Amiri', serif">[f(x)]ⁿ' = n[f(x)]ⁿ⁻¹ · f'(x)</text>
+        <rect x="20" y="90" width="360" height="35" rx="6" fill="#fbcfe8" stroke="#ec4899" stroke-width="2"/>
+        <text x="200" y="113" text-anchor="middle" font-size="11" fill="#9f1239" font-family="'Amiri', serif">f(g(x))' = f'(g(x)) · g'(x)</text>
+        <rect x="20" y="135" width="360" height="35" rx="6" fill="#fbcfe8" stroke="#ec4899" stroke-width="2"/>
+        <text x="200" y="158" text-anchor="middle" font-size="11" fill="#9f1239" font-family="'Amiri', serif">√f(x)' = f'(x) / (2√f(x))</text>
+        <rect x="20" y="180" width="360" height="35" rx="6" fill="#fbcfe8" stroke="#ec4899" stroke-width="2"/>
+        <text x="200" y="203" text-anchor="middle" font-size="11" fill="#9f1239" font-family="'Amiri', serif">f(x²)' = f'(x²) · 2x</text>
+        <rect x="20" y="225" width="360" height="35" rx="6" fill="#fbcfe8" stroke="#ec4899" stroke-width="2"/>
+        <text x="200" y="248" text-anchor="middle" font-size="11" fill="#9f1239" font-family="'Amiri', serif">f(√x)' = f'(√x) · 1/(2√x)</text>
+    </svg>`,
+    
+    exercise_31: `<svg class="svg-graph" width="400" height="260" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="250" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+        <text x="200" y="25" text-anchor="middle" font-size="14" fill="#065f46" font-weight="bold">📝 تمرين 31 - Exercise 31</text>
+        <text x="200" y="50" text-anchor="middle" font-size="12" fill="#065f46">h(x) = f(g(x)), find h'(1)</text>
+        <rect x="20" y="65" width="360" height="80" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+        <text x="200" y="85" text-anchor="middle" font-size="11" fill="#065f46">Given:</text>
+        <text x="200" y="105" text-anchor="middle" font-size="10" fill="#065f46">f'(2)=3, f'(1)=4, g(1)=2, f(1)=3</text>
+        <text x="200" y="125" text-anchor="middle" font-size="10" fill="#065f46">g'(1)=-2, g'(3)=5</text>
+        <text x="200" y="145" text-anchor="middle" font-size="10" fill="#065f46">f(2)=?, f(3)=?</text>
+        <rect x="20" y="155" width="360" height="85" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+        <text x="200" y="175" text-anchor="middle" font-size="11" fill="#065f46" font-weight="bold">Solution:</text>
+        <text x="200" y="195" text-anchor="middle" font-size="10" fill="#065f46">h'(1) = f'(g(1)) · g'(1)</text>
+        <text x="200" y="215" text-anchor="middle" font-size="10" fill="#065f46">= f'(2) · (-2) = 3 · (-2) = -6</text>
+        <text x="200" y="235" text-anchor="middle" font-size="12" fill="#dc2626" font-weight="bold">h'(1) = -6</text>
+    </svg>`,
+    
+    exercise_32: `<svg class="svg-graph" width="400" height="260" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="250" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+        <text x="200" y="25" text-anchor="middle" font-size="14" fill="#5b21b6" font-weight="bold">📝 تمرين 32 - Exercise 32</text>
+        <text x="200" y="50" text-anchor="middle" font-size="12" fill="#5b21b6">h(x) = f(g(x)), find h'(2)</text>
+        <rect x="20" y="65" width="360" height="80" rx="6" fill="#ddd6fe" stroke="#7c3aed" stroke-width="2"/>
+        <text x="200" y="85" text-anchor="middle" font-size="11" fill="#5b21b6">Given:</text>
+        <text x="200" y="105" text-anchor="middle" font-size="10" fill="#5b21b6">f'(3)=-3, f'(2)=-1, g(2)=3, f(2)=1</text>
+        <text x="200" y="125" text-anchor="middle" font-size="10" fill="#5b21b6">g'(1)=2, g'(2)=4</text>
+        <text x="200" y="145" text-anchor="middle" font-size="10" fill="#5b21b6">f(3)=?, g(3)=?</text>
+        <rect x="20" y="155" width="360" height="85" rx="6" fill="#ddd6fe" stroke="#7c3aed" stroke-width="2"/>
+        <text x="200" y="175" text-anchor="middle" font-size="11" fill="#5b21b6" font-weight="bold">Solution:</text>
+        <text x="200" y="195" text-anchor="middle" font-size="10" fill="#5b21b6">h'(2) = f'(g(2)) · g'(2)</text>
+        <text x="200" y="215" text-anchor="middle" font-size="10" fill="#5b21b6">= f'(3) · 4 = (-3) · 4 = -12</text>
+        <text x="200" y="235" text-anchor="middle" font-size="12" fill="#dc2626" font-weight="bold">h'(2) = -12</text>
+    </svg>`,
+    
+    symmetry_graph: `<svg class="svg-graph" width="400" height="260" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="390" height="250" rx="12" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+        <text x="200" y="25" text-anchor="middle" font-size="14" fill="#991b1b" font-weight="bold">📈 تماثل الدالة حول x=a</text>
+        <line x1="50" y1="220" x2="350" y2="220" stroke="#374151" stroke-width="2" marker-end="url(#arrow1)"/>
+        <line x1="200" y1="220" x2="200" y2="40" stroke="#374151" stroke-width="2" marker-end="url(#arrow1)"/>
+        <text x="360" y="225" font-size="12" fill="#374151">x</text>
+        <text x="190" y="35" font-size="12" fill="#374151">y</text>
+        <!-- Symmetric curve -->
+        <path d="M 100 180 Q 150 100 200 80 Q 250 100 300 180" fill="none" stroke="#dc2626" stroke-width="3"/>
+        <!-- Symmetry line -->
+        <line x1="200" y1="40" x2="200" y2="220" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5"/>
+        <text x="210" y="60" font-size="11" fill="#7c3aed" font-weight="bold">x = a</text>
+        <!-- Point at x=a -->
+        <circle cx="200" cy="80" r="6" fill="#dc2626"/>
+        <text x="215" y="85" font-size="10" fill="#dc2626" font-weight="bold">(a, f(a))</text>
+        <!-- Tangent line (horizontal) -->
+        <line x1="150" y1="80" x2="250" y2="80" stroke="#10b981" stroke-width="2"/>
+        <text x="260" y="85" font-size="10" fill="#10b981" font-weight="bold">Tangent (horizontal)</text>
+        <text x="200" y="245" text-anchor="middle" font-size="11" fill="#991b1b">If f is symmetric about x=a, then f'(a) = 0</text>
+        <text x="200" y="260" text-anchor="middle" font-size="10" fill="#991b1b">Tangent at symmetry point is horizontal</text>
+        <defs><marker id="arrow1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#374151"/></marker></defs>
+    </svg>`
+};
+
+// ==================== EXAM DATA - 30 QUESTIONS ====================
+const originalExamData = {
+    sections: [
+        {
+            id: 'sec1',
+            title: { ar: '🔹 القسم 1: تمرين 31 - h(x) = f(g(x)) (Q1-Q5)', en: '🔹 Section 1: Exercise 31 - h(x) = f(g(x)) (Q1-Q5)' },
+            questions: [
+                {
+                    q: { ar: '<strong>تمرين 31:</strong> h(x) = f(g(x)). المعطيات: f\'(2)=3, f\'(1)=4, g(1)=2, f(1)=3, g\'(1)=-2, g\'(3)=5. ما قيمة h\'(1)؟', en: '<strong>Exercise 31:</strong> h(x) = f(g(x)). Given: f\'(2)=3, f\'(1)=4, g(1)=2, f(1)=3, g\'(1)=-2, g\'(3)=5. What is h\'(1)?' },
+                    svg: svgGraphs.exercise_31,
+                    options: [
+                        { ar: '<span class="math-display">-6</span>', en: '<span class="math-display">-6</span>' },
+                        { ar: '<span class="math-display">6</span>', en: '<span class="math-display">6</span>' },
+                        { ar: '<span class="math-display">-8</span>', en: '<span class="math-display">-8</span>' },
+                        { ar: '<span class="math-display">12</span>', en: '<span class="math-display">12</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'h\'(1) = f\'(g(1))·g\'(1) = f\'(2)·(-2) = 3·(-2) = -6', en: 'h\'(1) = f\'(g(1))·g\'(1) = f\'(2)·(-2) = 3·(-2) = -6' }
+                },
+                {
+                    q: { ar: 'نفس تمرين 31: ما قيمة g(1) المستخدمة في الحساب؟', en: 'Same Exercise 31: What is the value of g(1) used in calculation?' },
+                    options: [
+                        { ar: '<span class="math-display">2</span>', en: '<span class="math-display">2</span>' },
+                        { ar: '<span class="math-display">1</span>', en: '<span class="math-display">1</span>' },
+                        { ar: '<span class="math-display">3</span>', en: '<span class="math-display">3</span>' },
+                        { ar: '<span class="math-display">-2</span>', en: '<span class="math-display">-2</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'g(1) = 2 (من المعطيات)', en: 'g(1) = 2 (from given values)' }
+                },
+                {
+                    q: { ar: 'نفس تمرين 31: ما قيمة f\'(g(1))؟', en: 'Same Exercise 31: What is f\'(g(1))?' },
+                    options: [
+                        { ar: '<span class="math-display">3</span>', en: '<span class="math-display">3</span>' },
+                        { ar: '<span class="math-display">4</span>', en: '<span class="math-display">4</span>' },
+                        { ar: '<span class="math-display">5</span>', en: '<span class="math-display">5</span>' },
+                        { ar: '<span class="math-display">-2</span>', en: '<span class="math-display">-2</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'f\'(g(1)) = f\'(2) = 3', en: 'f\'(g(1)) = f\'(2) = 3' }
+                },
+                {
+                    q: { ar: 'نفس تمرين 31: ما صيغة قاعدة السلسلة المستخدمة؟', en: 'Same Exercise 31: What is the chain rule formula used?' },
+                    svg: svgGraphs.chain_rule,
+                    options: [
+                        { ar: '<span class="math-display">h\'(x) = f\'(g(x))·g\'(x)</span>', en: '<span class="math-display">h\'(x) = f\'(g(x))·g\'(x)</span>' },
+                        { ar: '<span class="math-display">h\'(x) = f\'(x)·g\'(x)</span>', en: '<span class="math-display">h\'(x) = f\'(x)·g\'(x)</span>' },
+                        { ar: '<span class="math-display">h\'(x) = f(g\'(x))</span>', en: '<span class="math-display">h\'(x) = f(g\'(x))</span>' },
+                        { ar: '<span class="math-display">h\'(x) = f\'(x)/g\'(x)</span>', en: '<span class="math-display">h\'(x) = f\'(x)/g\'(x)</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'h\'(x) = f\'(g(x))·g\'(x) (قاعدة السلسلة)', en: 'h\'(x) = f\'(g(x))·g\'(x) (Chain Rule)' }
+                },
+                {
+                    q: { ar: 'نفس تمرين 31: لو كانت g\'(1) = 2 بدلاً من -2، فما h\'(1)؟', en: 'Same Exercise 31: If g\'(1) = 2 instead of -2, what is h\'(1)?' },
+                    options: [
+                        { ar: '<span class="math-display">6</span>', en: '<span class="math-display">6</span>' },
+                        { ar: '<span class="math-display">-6</span>', en: '<span class="math-display">-6</span>' },
+                        { ar: '<span class="math-display">8</span>', en: '<span class="math-display">8</span>' },
+                        { ar: '<span class="math-display">-8</span>', en: '<span class="math-display">-8</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'h\'(1) = f\'(2)·g\'(1) = 3·2 = 6', en: 'h\'(1) = f\'(2)·g\'(1) = 3·2 = 6' }
+                }
+            ]
+        },
+        {
+            id: 'sec2',
+            title: { ar: '🔹 القسم 2: تمرين 32 - h(x) = f(g(x)) (Q6-Q10)', en: '🔹 Section 2: Exercise 32 - h(x) = f(g(x)) (Q6-Q10)' },
+            questions: [
+                {
+                    q: { ar: '<strong>تمرين 32:</strong> h(x) = f(g(x)). المعطيات: f\'(3)=-3, f\'(2)=-1, g(2)=3, f(2)=1, g\'(1)=2, g\'(2)=4. ما قيمة h\'(2)؟', en: '<strong>Exercise 32:</strong> h(x) = f(g(x)). Given: f\'(3)=-3, f\'(2)=-1, g(2)=3, f(2)=1, g\'(1)=2, g\'(2)=4. What is h\'(2)?' },
+                    svg: svgGraphs.exercise_32,
+                    options: [
+                        { ar: '<span class="math-display">-12</span>', en: '<span class="math-display">-12</span>' },
+                        { ar: '<span class="math-display">12</span>', en: '<span class="math-display">12</span>' },
+                        { ar: '<span class="math-display">-4</span>', en: '<span class="math-display">-4</span>' },
+                        { ar: '<span class="math-display">4</span>', en: '<span class="math-display">4</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'h\'(2) = f\'(g(2))·g\'(2) = f\'(3)·4 = (-3)·4 = -12', en: 'h\'(2) = f\'(g(2))·g\'(2) = f\'(3)·4 = (-3)·4 = -12' }
+                },
+                {
+                    q: { ar: 'نفس تمرين 32: ما قيمة g(2)؟', en: 'Same Exercise 32: What is g(2)?' },
+                    options: [
+                        { ar: '<span class="math-display">3</span>', en: '<span class="math-display">3</span>' },
+                        { ar: '<span class="math-display">2</span>', en: '<span class="math-display">2</span>' },
+                        { ar: '<span class="math-display">1</span>', en: '<span class="math-display">1</span>' },
+                        { ar: '<span class="math-display">4</span>', en: '<span class="math-display">4</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'g(2) = 3 (من المعطيات)', en: 'g(2) = 3 (from given values)' }
+                },
+                {
+                    q: { ar: 'نفس تمرين 32: ما قيمة f\'(g(2))؟', en: 'Same Exercise 32: What is f\'(g(2))?' },
+                    options: [
+                        { ar: '<span class="math-display">-3</span>', en: '<span class="math-display">-3</span>' },
+                        { ar: '<span class="math-display">-1</span>', en: '<span class="math-display">-1</span>' },
+                        { ar: '<span class="math-display">3</span>', en: '<span class="math-display">3</span>' },
+                        { ar: '<span class="math-display">4</span>', en: '<span class="math-display">4</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'f\'(g(2)) = f\'(3) = -3', en: 'f\'(g(2)) = f\'(3) = -3' }
+                },
+                {
+                    q: { ar: 'نفس تمرين 32: لو كانت f\'(3) = 2 بدلاً من -3، فما h\'(2)؟', en: 'Same Exercise 32: If f\'(3) = 2 instead of -3, what is h\'(2)?' },
+                    options: [
+                        { ar: '<span class="math-display">8</span>', en: '<span class="math-display">8</span>' },
+                        { ar: '<span class="math-display">-8</span>', en: '<span class="math-display">-8</span>' },
+                        { ar: '<span class="math-display">6</span>', en: '<span class="math-display">6</span>' },
+                        { ar: '<span class="math-display">-6</span>', en: '<span class="math-display">-6</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'h\'(2) = f\'(3)·g\'(2) = 2·4 = 8', en: 'h\'(2) = f\'(3)·g\'(2) = 2·4 = 8' }
+                },
+                {
+                    q: { ar: 'نفس تمرين 32: ما الخطوات الصحيحة لحساب h\'(2)؟', en: 'Same Exercise 32: What are the correct steps to find h\'(2)?' },
+                    options: [
+                        { ar: 'أوجد g(2)=3، ثم f\'(3)=-3، ثم اضرب في g\'(2)=4', en: 'Find g(2)=3, then f\'(3)=-3, then multiply by g\'(2)=4' },
+                        { ar: 'أوجد f(2)=1، ثم g\'(2)=4، ثم اضرب', en: 'Find f(2)=1, then g\'(2)=4, then multiply' },
+                        { ar: 'أوجد f\'(2)=-1، ثم g(2)=3، ثم اضرب', en: 'Find f\'(2)=-1, then g(2)=3, then multiply' },
+                        { ar: 'أوجد g\'(1)=2، ثم f\'(3)=-3، ثم اضرب', en: 'Find g\'(1)=2, then f\'(3)=-3, then multiply' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'g(2)=3 → f\'(g(2))=f\'(3)=-3 → h\'(2) = -3·4 = -12', en: 'g(2)=3 → f\'(g(2))=f\'(3)=-3 → h\'(2) = -3·4 = -12' }
+                }
+            ]
+        },
+        {
+            id: 'sec3',
+            title: { ar: '🔹 القسم 3: الدوال الزوجية والفردية - تمرين 33 (Q11-Q15)', en: '🔹 Section 3: Even/Odd Functions - Exercise 33 (Q11-Q15)' },
+            questions: [
+                {
+                    q: { ar: '<strong>تمرين 33:</strong> إذا كانت f دالة زوجية (f(-x) = f(x))، فما نوع مشتقتها f\'؟', en: '<strong>Exercise 33:</strong> If f is an even function (f(-x) = f(x)), what type is its derivative f\'?' },
+                    svg: svgGraphs.even_odd_functions,
+                    options: [
+                        { ar: 'دالة فردية (Odd)', en: 'Odd function' },
+                        { ar: 'دالة زوجية (Even)', en: 'Even function' },
+                        { ar: 'لا زوجية ولا فردية', en: 'Neither even nor odd' },
+                        { ar: 'ثابتة', en: 'Constant' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'مشتقة الدالة الزوجية هي دالة فردية', en: 'Derivative of even function is odd function' }
+                },
+                {
+                    q: { ar: 'إذا كانت f دالة فردية (f(-x) = -f(x))، فما نوع مشتقتها f\'؟', en: 'If f is an odd function (f(-x) = -f(x)), what type is its derivative f\'?' },
+                    options: [
+                        { ar: 'دالة زوجية (Even)', en: 'Even function' },
+                        { ar: 'دالة فردية (Odd)', en: 'Odd function' },
+                        { ar: 'لا زوجية ولا فردية', en: 'Neither even nor odd' },
+                        { ar: 'ثابتة', en: 'Constant' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'مشتقة الدالة الفردية هي دالة زوجية', en: 'Derivative of odd function is even function' }
+                },
+                {
+                    q: { ar: 'إذا كان التمثيل البياني لـ f متماثلاً حول x = a، فما قيمة f\'(a)؟', en: 'If the graph of f is symmetric about x = a, what is f\'(a)?' },
+                    svg: svgGraphs.symmetry_graph,
+                    options: [
+                        { ar: '<span class="math-display">0</span> (المماس أفقي)', en: '<span class="math-display">0</span> (tangent is horizontal)' },
+                        { ar: '<span class="math-display">1</span>', en: '<span class="math-display">1</span>' },
+                        { ar: '<span class="math-display">a</span>', en: '<span class="math-display">a</span>' },
+                        { ar: 'لا يمكن التحديد', en: 'Cannot determine' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'عند نقطة التماثل، المماس أفقي → f\'(a) = 0', en: 'At symmetry point, tangent is horizontal → f\'(a) = 0' }
+                },
+                {
+                    q: { ar: 'الدالة f(x) = x² هي دالة:', en: 'The function f(x) = x² is:' },
+                    options: [
+                        { ar: 'زوجية (Even)', en: 'Even' },
+                        { ar: 'فردية (Odd)', en: 'Odd' },
+                        { ar: 'لا زوجية ولا فردية', en: 'Neither' },
+                        { ar: 'كلاهما', en: 'Both' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'f(-x) = (-x)² = x² = f(x) → زوجية', en: 'f(-x) = (-x)² = x² = f(x) → Even' }
+                },
+                {
+                    q: { ar: 'مشتقة f(x) = x² هي f\'(x) = 2x. هذه الدالة:', en: 'Derivative of f(x) = x² is f\'(x) = 2x. This function is:' },
+                    options: [
+                        { ar: 'فردية (Odd)', en: 'Odd' },
+                        { ar: 'زوجية (Even)', en: 'Even' },
+                        { ar: 'لا زوجية ولا فردية', en: 'Neither' },
+                        { ar: 'ثابتة', en: 'Constant' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'f\'(-x) = 2(-x) = -2x = -f\'(x) → فردية (مشتقة الزوجية فردية)', en: 'f\'(-x) = -2x = -f\'(x) → Odd (derivative of even is odd)' }
+                }
+            ]
+        },
+        {
+            id: 'sec4',
+            title: { ar: '🔹 القسم 4: تمارين 35-36 - مشتقات مركبة (Q16-Q20)', en: '🔹 Section 4: Exercises 35-36 - Composite Derivatives (Q16-Q20)' },
+            questions: [
+                {
+                    q: { ar: '<strong>تمرين 35(a):</strong> ما مشتقة <span class="math-display">f(x²)</span>؟', en: '<strong>Exercise 35(a):</strong> What is the derivative of <span class="math-display">f(x²)</span>?' },
+                    svg: svgGraphs.composite_derivatives,
+                    options: [
+                        { ar: '<span class="math-display">2x·f\'(x²)</span>', en: '<span class="math-display">2x·f\'(x²)</span>' },
+                        { ar: '<span class="math-display">f\'(x²)</span>', en: '<span class="math-display">f\'(x²)</span>' },
+                        { ar: '<span class="math-display">x²·f\'(x)</span>', en: '<span class="math-display">x²·f\'(x)</span>' },
+                        { ar: '<span class="math-display">2x·f\'(x)</span>', en: '<span class="math-display">2x·f\'(x)</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'باستخدام قاعدة السلسلة: d/dx[f(x²)] = f\'(x²)·2x', en: 'By chain rule: d/dx[f(x²)] = f\'(x²)·2x' }
+                },
+                {
+                    q: { ar: '<strong>تمرين 35(b):</strong> ما مشتقة <span class="math-display">[f(x)]²</span>؟', en: '<strong>Exercise 35(b):</strong> What is the derivative of <span class="math-display">[f(x)]²</span>?' },
+                    options: [
+                        { ar: '<span class="math-display">2f(x)·f\'(x)</span>', en: '<span class="math-display">2f(x)·f\'(x)</span>' },
+                        { ar: '<span class="math-display">[f\'(x)]²</span>', en: '<span class="math-display">[f\'(x)]²</span>' },
+                        { ar: '<span class="math-display">2f\'(x)</span>', en: '<span class="math-display">2f\'(x)</span>' },
+                        { ar: '<span class="math-display">f(x)·f\'(x)</span>', en: '<span class="math-display">f(x)·f\'(x)</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'باستخدام قاعدة السلسلة: d/dx[f(x)]² = 2f(x)·f\'(x)', en: 'By chain rule: d/dx[f(x)]² = 2f(x)·f\'(x)' }
+                },
+                {
+                    q: { ar: '<strong>تمرين 35(c):</strong> ما مشتقة <span class="math-display">f(f(x))</span>؟', en: '<strong>Exercise 35(c):</strong> What is the derivative of <span class="math-display">f(f(x))</span>?' },
+                    options: [
+                        { ar: '<span class="math-display">f\'(f(x))·f\'(x)</span>', en: '<span class="math-display">f\'(f(x))·f\'(x)</span>' },
+                        { ar: '<span class="math-display">[f\'(x)]²</span>', en: '<span class="math-display">[f\'(x)]²</span>' },
+                        { ar: '<span class="math-display">f\'(x)·f\'(x)</span>', en: '<span class="math-display">f\'(x)·f\'(x)</span>' },
+                        { ar: '<span class="math-display">f(f\'(x))</span>', en: '<span class="math-display">f(f\'(x))</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'باستخدام قاعدة السلسلة: d/dx[f(f(x))] = f\'(f(x))·f\'(x)', en: 'By chain rule: d/dx[f(f(x))] = f\'(f(x))·f\'(x)' }
+                },
+                {
+                    q: { ar: '<strong>تمرين 36(a):</strong> ما مشتقة <span class="math-display">f(√x)</span>؟', en: '<strong>Exercise 36(a):</strong> What is the derivative of <span class="math-display">f(√x)</span>?' },
+                    options: [
+                        { ar: '<span class="math-display">f\'(√x)/(2√x)</span>', en: '<span class="math-display">f\'(√x)/(2√x)</span>' },
+                        { ar: '<span class="math-display">f\'(√x)·√x</span>', en: '<span class="math-display">f\'(√x)·√x</span>' },
+                        { ar: '<span class="math-display">f\'(x)/(2√x)</span>', en: '<span class="math-display">f\'(x)/(2√x)</span>' },
+                        { ar: '<span class="math-display">f\'(√x)·2√x</span>', en: '<span class="math-display">f\'(√x)·2√x</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'd/dx[f(√x)] = f\'(√x)·(1/(2√x)) = f\'(√x)/(2√x)', en: 'd/dx[f(√x)] = f\'(√x)·(1/(2√x)) = f\'(√x)/(2√x)' }
+                },
+                {
+                    q: { ar: '<strong>تمرين 36(b):</strong> ما مشتقة <span class="math-display">√f(x)</span>؟', en: '<strong>Exercise 36(b):</strong> What is the derivative of <span class="math-display">√f(x)</span>?' },
+                    options: [
+                        { ar: '<span class="math-display">f\'(x)/(2√f(x))</span>', en: '<span class="math-display">f\'(x)/(2√f(x))</span>' },
+                        { ar: '<span class="math-display">1/(2√f(x))</span>', en: '<span class="math-display">1/(2√f(x))</span>' },
+                        { ar: '<span class="math-display">f\'(x)·√f(x)</span>', en: '<span class="math-display">f\'(x)·√f(x)</span>' },
+                        { ar: '<span class="math-display">2√f(x)·f\'(x)</span>', en: '<span class="math-display">2√f(x)·f\'(x)</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'd/dx[√f(x)] = f\'(x)/(2√f(x))', en: 'd/dx[√f(x)] = f\'(x)/(2√f(x))' }
+                }
+            ]
+        },
+        {
+            id: 'sec5',
+            title: { ar: '🔹 القسم 5: تمارين 37-38 - مشتقات أكثر تعقيداً (Q21-Q25)', en: '🔹 Section 5: Exercises 37-38 - More Complex Derivatives (Q21-Q25)' },
+            questions: [
+                {
+                    q: { ar: '<strong>تمرين 36(c):</strong> ما مشتقة <span class="math-display">f(xf(x))</span>؟', en: '<strong>Exercise 36(c):</strong> What is the derivative of <span class="math-display">f(xf(x))</span>?' },
+                    options: [
+                        { ar: '<span class="math-display">f\'(xf(x))·[f(x) + xf\'(x)]</span>', en: '<span class="math-display">f\'(xf(x))·[f(x) + xf\'(x)]</span>' },
+                        { ar: '<span class="math-display">f\'(xf(x))·f(x)</span>', en: '<span class="math-display">f\'(xf(x))·f(x)</span>' },
+                        { ar: '<span class="math-display">f\'(xf(x))·xf\'(x)</span>', en: '<span class="math-display">f\'(xf(x))·xf\'(x)</span>' },
+                        { ar: '<span class="math-display">f\'(x)·f(xf(x))</span>', en: '<span class="math-display">f\'(x)·f(xf(x))</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'd/dx[f(xf(x))] = f\'(xf(x))·d/dx[xf(x)] = f\'(xf(x))·[f(x) + xf\'(x)]', en: 'd/dx[f(xf(x))] = f\'(xf(x))·[f(x) + xf\'(x)] (product rule inside)' }
+                },
+                {
+                    q: { ar: 'إذا كانت h(x) = f(g(x)) و f\'(5)=2, g(3)=5, g\'(3)=4، فما h\'(3)؟', en: 'If h(x) = f(g(x)) and f\'(5)=2, g(3)=5, g\'(3)=4, what is h\'(3)?' },
+                    options: [
+                        { ar: '<span class="math-display">8</span>', en: '<span class="math-display">8</span>' },
+                        { ar: '<span class="math-display">10</span>', en: '<span class="math-display">10</span>' },
+                        { ar: '<span class="math-display">6</span>', en: '<span class="math-display">6</span>' },
+                        { ar: '<span class="math-display">20</span>', en: '<span class="math-display">20</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'h\'(3) = f\'(g(3))·g\'(3) = f\'(5)·4 = 2·4 = 8', en: 'h\'(3) = f\'(g(3))·g\'(3) = f\'(5)·4 = 2·4 = 8' }
+                },
+                {
+                    q: { ar: 'ما مشتقة <span class="math-display">[f(x)]³</span>؟', en: 'What is the derivative of <span class="math-display">[f(x)]³</span>?' },
+                    options: [
+                        { ar: '<span class="math-display">3[f(x)]²·f\'(x)</span>', en: '<span class="math-display">3[f(x)]²·f\'(x)</span>' },
+                        { ar: '<span class="math-display">[f\'(x)]³</span>', en: '<span class="math-display">[f\'(x)]³</span>' },
+                        { ar: '<span class="math-display">3f\'(x)</span>', en: '<span class="math-display">3f\'(x)</span>' },
+                        { ar: '<span class="math-display">f(x)²·f\'(x)</span>', en: '<span class="math-display">f(x)²·f\'(x)</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'd/dx[f(x)]³ = 3[f(x)]²·f\'(x) (قاعدة السلسلة مع قاعدة القوة)', en: 'd/dx[f(x)]³ = 3[f(x)]²·f\'(x) (chain rule with power rule)' }
+                },
+                {
+                    q: { ar: 'ما مشتقة <span class="math-display">f(x³)</span>؟', en: 'What is the derivative of <span class="math-display">f(x³)</span>?' },
+                    options: [
+                        { ar: '<span class="math-display">3x²·f\'(x³)</span>', en: '<span class="math-display">3x²·f\'(x³)</span>' },
+                        { ar: '<span class="math-display">f\'(x³)</span>', en: '<span class="math-display">f\'(x³)</span>' },
+                        { ar: '<span class="math-display">x³·f\'(x)</span>', en: '<span class="math-display">x³·f\'(x)</span>' },
+                        { ar: '<span class="math-display">3x²·f\'(x)</span>', en: '<span class="math-display">3x²·f\'(x)</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'd/dx[f(x³)] = f\'(x³)·3x²', en: 'd/dx[f(x³)] = f\'(x³)·3x²' }
+                },
+                {
+                    q: { ar: 'إذا كانت f(x) = x² + 1 و g(x) = 3x، فما (f∘g)\'(2)؟', en: 'If f(x) = x² + 1 and g(x) = 3x, what is (f∘g)\'(2)?' },
+                    options: [
+                        { ar: '<span class="math-display">36</span>', en: '<span class="math-display">36</span>' },
+                        { ar: '<span class="math-display">12</span>', en: '<span class="math-display">12</span>' },
+                        { ar: '<span class="math-display">18</span>', en: '<span class="math-display">18</span>' },
+                        { ar: '<span class="math-display">6</span>', en: '<span class="math-display">6</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: '(f∘g)(x) = f(g(x)) = (3x)²+1 = 9x²+1. المشتقة = 18x. عند x=2: 18·2 = 36', en: '(f∘g)(x) = 9x²+1. Derivative = 18x. At x=2: 18·2 = 36' }
+                }
+            ]
+        },
+        {
+            id: 'sec6',
+            title: { ar: '🔹 القسم 6: مسائل مركبة وتطبيقات (Q26-Q30)', en: '🔹 Section 6: Mixed Problems & Applications (Q26-Q30)' },
+            questions: [
+                {
+                    q: { ar: 'إذا كانت h(x) = f(g(x)) و f\'(4)=5, g(2)=4, g\'(2)=3، فما h\'(2)؟', en: 'If h(x) = f(g(x)) and f\'(4)=5, g(2)=4, g\'(2)=3, what is h\'(2)?' },
+                    options: [
+                        { ar: '<span class="math-display">15</span>', en: '<span class="math-display">15</span>' },
+                        { ar: '<span class="math-display">12</span>', en: '<span class="math-display">12</span>' },
+                        { ar: '<span class="math-display">20</span>', en: '<span class="math-display">20</span>' },
+                        { ar: '<span class="math-display">8</span>', en: '<span class="math-display">8</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'h\'(2) = f\'(g(2))·g\'(2) = f\'(4)·3 = 5·3 = 15', en: 'h\'(2) = f\'(g(2))·g\'(2) = f\'(4)·3 = 5·3 = 15' }
+                },
+                {
+                    q: { ar: 'ما مشتقة <span class="math-display">√(x² + 1)</span>؟', en: 'What is the derivative of <span class="math-display">√(x² + 1)</span>?' },
+                    options: [
+                        { ar: '<span class="math-display">x/√(x²+1)</span>', en: '<span class="math-display">x/√(x²+1)</span>' },
+                        { ar: '<span class="math-display">1/(2√(x²+1))</span>', en: '<span class="math-display">1/(2√(x²+1))</span>' },
+                        { ar: '<span class="math-display">2x/√(x²+1)</span>', en: '<span class="math-display">2x/√(x²+1)</span>' },
+                        { ar: '<span class="math-display">x/(x²+1)</span>', en: '<span class="math-display">x/(x²+1)</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'd/dx[√(x²+1)] = (2x)/(2√(x²+1)) = x/√(x²+1)', en: 'd/dx[√(x²+1)] = (2x)/(2√(x²+1)) = x/√(x²+1)' }
+                },
+                {
+                    q: { ar: 'إذا كانت f دالة زوجية و f\'(3) = 5، فما f\'(-3)؟', en: 'If f is an even function and f\'(3) = 5, what is f\'(-3)?' },
+                    options: [
+                        { ar: '<span class="math-display">-5</span>', en: '<span class="math-display">-5</span>' },
+                        { ar: '<span class="math-display">5</span>', en: '<span class="math-display">5</span>' },
+                        { ar: '<span class="math-display">0</span>', en: '<span class="math-display">0</span>' },
+                        { ar: '<span class="math-display">3</span>', en: '<span class="math-display">3</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'مشتقة الدالة الزوجية فردية: f\'(-x) = -f\'(x). إذن f\'(-3) = -f\'(3) = -5', en: 'Derivative of even function is odd: f\'(-x) = -f\'(x). So f\'(-3) = -f\'(3) = -5' }
+                },
+                {
+                    q: { ar: 'إذا كانت f دالة فردية و f\'(2) = 7، فما f\'(-2)؟', en: 'If f is an odd function and f\'(2) = 7, what is f\'(-2)?' },
+                    options: [
+                        { ar: '<span class="math-display">7</span>', en: '<span class="math-display">7</span>' },
+                        { ar: '<span class="math-display">-7</span>', en: '<span class="math-display">-7</span>' },
+                        { ar: '<span class="math-display">0</span>', en: '<span class="math-display">0</span>' },
+                        { ar: '<span class="math-display">2</span>', en: '<span class="math-display">2</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'مشتقة الدالة الفردية زوجية: f\'(-x) = f\'(x). إذن f\'(-2) = f\'(2) = 7', en: 'Derivative of odd function is even: f\'(-x) = f\'(x). So f\'(-2) = f\'(2) = 7' }
+                },
+                {
+                    q: { ar: 'ما مشتقة <span class="math-display">f(x)·g(x)</span>؟ (قاعدة الضرب)', en: 'What is the derivative of <span class="math-display">f(x)·g(x)</span>? (Product Rule)' },
+                    options: [
+                        { ar: '<span class="math-display">f\'(x)g(x) + f(x)g\'(x)</span>', en: '<span class="math-display">f\'(x)g(x) + f(x)g\'(x)</span>' },
+                        { ar: '<span class="math-display">f\'(x)g\'(x)</span>', en: '<span class="math-display">f\'(x)g\'(x)</span>' },
+                        { ar: '<span class="math-display">f\'(x)g(x) - f(x)g\'(x)</span>', en: '<span class="math-display">f\'(x)g(x) - f(x)g\'(x)</span>' },
+                        { ar: '<span class="math-display">f(x)g\'(x) - f\'(x)g(x)</span>', en: '<span class="math-display">f(x)g\'(x) - f\'(x)g(x)</span>' }
+                    ],
+                    correct: 0,
+                    answer: { ar: 'قاعدة الضرب: (fg)\' = f\'g + fg\'', en: 'Product Rule: (fg)\' = f\'g + fg\'' }
+                }
+            ]
+        }
+    ]
+};
+
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function prepareShuffledExam() {
+    rng = mulberry32(currentSeed);
+    examData = JSON.parse(JSON.stringify(originalExamData));
+    correctAnswersMap = {};
+    let globalIdx = 0;
+    examData.sections.forEach((section) => {
+        section.questions = shuffleArray(section.questions);
+        section.questions.forEach((q) => {
+            const optionsWithCorrect = q.options.map((opt, idx) => ({ option: opt, isCorrect: idx === q.correct }));
+            const shuffledOptions = shuffleArray(optionsWithCorrect);
+            q.options = shuffledOptions.map(o => o.option);
+            q.correct = shuffledOptions.findIndex(o => o.isCorrect);
+            correctAnswersMap[globalIdx] = String.fromCharCode(97 + q.correct);
+            globalIdx++;
+        });
+    });
+}
+
+function reshuffleExam() {
+    const msg = currentLang === 'ar' ? '🔄 سيتم إنشاء أسئلة جديدة ومسح إجاباتك. هل أنت متأكد؟' : '🔄 New questions will be generated. Are you sure?';
+    if (confirm(msg)) {
+        currentSeed = Date.now(); timeRemaining = TOTAL_TIME; answersVisible = false;
+        prepareShuffledExam(); renderExam(); saveState();
+        alert(currentLang === 'ar' ? '🎲 تم تغيير الأسئلة! حظاً موفقاً! 🍀' : '🎲 Questions changed! Good luck! 🍀');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function setLanguage(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.body.classList.toggle('en-mode', lang === 'en');
+    renderExam(); saveState(false);
+}
+
+function renderExam() {
+    const container = document.getElementById('exam-content');
+    const labels = { ar: { option: ['أ', 'ب', 'ج', 'د'], answer: '✅ الإجابة:' }, en: { option: ['A', 'B', 'C', 'D'], answer: '✅ Answer:' } };
+    const lbl = labels[currentLang];
+    let html = '';
+    let globalIdx = 0;
+    
+    examData.sections.forEach((section, secIdx) => {
+        const badgeClass = ['module-1', 'module-2', 'module-3', 'module-4', 'module-5', 'module-6'][secIdx];
+        html += '<section class="bg-white p-6 rounded-2xl shadow-lg border-2 border-amber-100">';
+        html += '<div class="text-center mb-4"><span class="module-badge ' + badgeClass + '">' + section.title[currentLang] + '</span></div>';
+        html += '<ol class="space-y-4 text-sm">';
+        
+        section.questions.forEach((q) => {
+            html += '<li class="border-r-4 border-amber-400 pr-4 py-2" id="q-' + globalIdx + '">';
+            html += '<strong class="text-amber-700">' + (globalIdx + 1) + '.</strong> ' + q.q[currentLang] + '<br>';
+            if (q.svg) html += '<div class="graph-container">' + q.svg + '</div>';
+            
+            q.options.forEach((opt, oIdx) => {
+                html += '<label class="cursor-pointer block mt-2 mr-4 hover:bg-amber-50 rounded-lg p-2 transition">';
+                html += '<input type="radio" name="q' + globalIdx + '" value="' + String.fromCharCode(97 + oIdx) + '" class="mr-2 ml-2">';
+                html += '<span class="arabic-math">' + lbl.option[oIdx] + ') ' + opt[currentLang] + '</span>';
+                html += '</label>';
+            });
+            
+            html += '<div class="answer-box text-green-700 mt-3 font-medium ' + (answersVisible ? '' : 'hidden') + ' bg-green-50 rounded-lg p-3 border border-green-200">';
+            html += lbl.answer + ' ' + lbl.option[q.correct] + ') <span class="arabic-math">' + q.options[q.correct][currentLang] + '</span><br>';
+            html += '<span class="text-sm text-green-700 mt-2 block arabic-math">' + q.answer[currentLang] + '</span>';
+            html += '</div></li>';
+            globalIdx++;
+        });
+        
+        html += '</ol></section>';
+    });
+    
+    container.innerHTML = html;
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining % 60 === 0) saveState(false);
+        if (timeRemaining <= 600) document.getElementById('timer').classList.add('timer-warning');
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            alert(currentLang === 'ar' ? "⏰ انتهى الوقت!" : "⏰ Time's up!");
+            gradeExam();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(timeRemaining / 60);
+    const s = timeRemaining % 60;
+    document.getElementById('timer').textContent = m.toString().padStart(2,'0') + ':' + s.toString().padStart(2,'0');
+}
+
+function toggleAnswers() {
+    answersVisible = !answersVisible;
+    document.querySelectorAll('.answer-box').forEach(el => el.classList.toggle('hidden', !answersVisible));
+    saveState(false);
+}
+
+function gradeExam() {
+    let correctCount = 0;
+    const sectionScores = new Array(TOTAL_SECTIONS).fill(0);
+    
+    for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+        const sel = document.querySelector('input[name="q'+i+'"]:checked');
+        const li = document.getElementById('q-' + i);
+        if (li) {
+            const isCorrect = sel && sel.value === correctAnswersMap[i];
+            if (isCorrect) {
+                correctCount++;
+                li.classList.add('correct');
+                li.classList.remove('incorrect');
+                sectionScores[Math.floor(i / QUESTIONS_PER_SECTION)]++;
+            } else {
+                li.classList.add('incorrect');
+                li.classList.remove('correct');
+            }
+        }
+    }
+    
+    const score = Math.round((correctCount / TOTAL_QUESTIONS) * 100);
+    document.getElementById('res-total').textContent = score + ' / 100';
+    document.getElementById('res-name').textContent = document.getElementById('studentName').value || (currentLang === 'ar' ? 'بطل' : 'Champion');
+    document.getElementById('res-date').textContent = new Date().toLocaleDateString(currentLang === 'ar' ? 'ar-AE' : 'en-US');
+    
+    const pc = document.getElementById('sections-performance');
+    pc.innerHTML = '';
+    examData.sections.forEach((s, idx) => {
+        pc.innerHTML += '<div class="flex justify-between items-center p-3 bg-white rounded-lg"><span class="text-gray-700">' + s.title[currentLang] + '</span><span class="font-bold text-amber-700">' + sectionScores[idx] + '/' + QUESTIONS_PER_SECTION + '</span></div>';
+    });
+    
+    const badge = document.getElementById('success-badge');
+    document.getElementById('success-percent').textContent = score + '%';
+    
+    if (currentLang === 'ar') {
+        if (score >= 90) { badge.textContent = '🌟 ممتاز جداً!'; badge.className = 'success-badge grade-excellent'; }
+        else if (score >= 75) { badge.textContent = '👏 ممتاز!'; badge.className = 'success-badge grade-good'; }
+        else if (score >= 50) { badge.textContent = '👍 جيد'; badge.className = 'success-badge grade-pass'; }
+        else { badge.textContent = '💪 حاول مرة أخرى'; badge.className = 'success-badge grade-fail'; }
+    } else {
+        if (score >= 90) { badge.textContent = '🌟 Outstanding!'; badge.className = 'success-badge grade-excellent'; }
+        else if (score >= 75) { badge.textContent = '👏 Excellent!'; badge.className = 'success-badge grade-good'; }
+        else if (score >= 50) { badge.textContent = '👍 Good'; badge.className = 'success-badge grade-pass'; }
+        else { badge.textContent = '💪 Try Again'; badge.className = 'success-badge grade-fail'; }
+    }
+    
+    document.getElementById('results-panel').classList.remove('hidden');
+    document.getElementById('results-panel').scrollIntoView({ behavior: 'smooth' });
+    if (timerInterval) clearInterval(timerInterval);
+}
+
+function sendResultsToEmail() {
+    const btn = document.getElementById('sendEmailBtn');
+    const status = document.getElementById('emailStatus');
+    btn.disabled = true;
+    btn.textContent = currentLang === 'ar' ? '⏳ جاري الإرسال...' : '⏳ Sending...';
+    
+    const name = document.getElementById('studentName').value || 'غير محدد';
+    const studentClass = document.getElementById('studentClass').value || 'غير محدد';
+    const date = document.getElementById('examDate').value || new Date().toLocaleDateString();
+    const score = document.getElementById('res-total').textContent;
+    const successRate = document.getElementById('success-percent').textContent;
+    const badge = document.getElementById('success-badge').textContent;
+    
+    let questionsHTML = '<div style="font-family:Arial; direction:rtl;">';
+    questionsHTML += '<h2>📐 ' + (currentLang === 'ar' ? 'نتيجة امتحان قاعدة السلسلة' : 'Chain Rule Exam Result') + '</h2>';
+    questionsHTML += '<p><strong>' + (currentLang === 'ar' ? 'الاسم' : 'Name') + ':</strong> ' + name + '</p>';
+    questionsHTML += '<p><strong>' + (currentLang === 'ar' ? 'الشعبة' : 'Class') + ':</strong> ' + studentClass + '</p>';
+    questionsHTML += '<p><strong>' + (currentLang === 'ar' ? 'التاريخ' : 'Date') + ':</strong> ' + date + '</p>';
+    questionsHTML += '<p><strong>' + (currentLang === 'ar' ? 'الدرجة' : 'Score') + ':</strong> ' + score + ' (' + successRate + '%)</p>';
+    questionsHTML += '<p><strong>' + (currentLang === 'ar' ? 'التقدير' : 'Grade') + ':</strong> ' + badge + '</p>';
+    questionsHTML += '<hr><h3>' + (currentLang === 'ar' ? 'تفاصيل الإجابات:' : 'Answer Details:') + '</h3><table style="width:100%; border-collapse:collapse;">';
+    questionsHTML += '<tr style="background:#d97706; color:white;"><th style="padding:8px; border:1px solid #ddd;">#</th><th style="padding:8px; border:1px solid #ddd;">' + (currentLang === 'ar' ? 'السؤال' : 'Question') + '</th><th style="padding:8px; border:1px solid #ddd;">' + (currentLang === 'ar' ? 'إجابة الطالب' : 'Student Answer') + '</th><th style="padding:8px; border:1px solid #ddd;">' + (currentLang === 'ar' ? 'الصحيحة' : 'Correct') + '</th><th style="padding:8px; border:1px solid #ddd;">' + (currentLang === 'ar' ? 'النتيجة' : 'Result') + '</th></tr>';
+    
+    let globalIdx = 0;
+    examData.sections.forEach((section) => {
+        questionsHTML += '<tr style="background:#fef3c7;"><td colspan="5" style="padding:8px; font-weight:bold; border:1px solid #ddd;">' + section.title.ar + '</td></tr>';
+        section.questions.forEach((q) => {
+            const sel = document.querySelector('input[name="q'+globalIdx+'"]:checked');
+            const sv = sel ? sel.value : null;
+            const cv = correctAnswersMap[globalIdx];
+            const ic = sv === cv;
+            let sat = currentLang === 'ar' ? '❌ لم يجب' : '❌ No answer';
+            let sac = '#dc2626';
+            if (sv) {
+                const si = sv.charCodeAt(0) - 97;
+                sat = q.options[si][currentLang];
+                sac = ic ? '#16a34a' : '#dc2626';
+            }
+            const cat = q.options[q.correct][currentLang];
+            const rb = ic ? '#f0fdf4' : '#fef2f2';
+            questionsHTML += '<tr style="background:' + rb + ';"><td style="padding:8px; border:1px solid #ddd; text-align:center;">' + (globalIdx+1) + '</td><td style="padding:8px; border:1px solid #ddd;">' + q.q.ar.replace(/<[^>]+>/g, '') + '</td><td style="padding:8px; border:1px solid #ddd; color:' + sac + ';">' + sat + '</td><td style="padding:8px; border:1px solid #ddd; color:#16a34a;">' + cat + '</td><td style="padding:8px; border:1px solid #ddd; text-align:center;">' + (ic?'✅':'❌') + '</td></tr>';
+            globalIdx++;
+        });
+    });
+    questionsHTML += '</table></div>';
+    
+    const templateParams = {
+        to_email: TARGET_EMAIL,
+        student_name: name,
+        student_class: studentClass,
+        exam_date: date,
+        total_score: score,
+        success_rate: successRate,
+        grade: badge,
+        answers_table: questionsHTML
+    };
+    
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+        .then(() => {
+            status.textContent = currentLang === 'ar' ? '✅ تم الإرسال بنجاح!' : '✅ Sent successfully!';
+            status.style.color = '#16a34a';
+            btn.textContent = currentLang === 'ar' ? '✓ تم' : '✓ Sent';
+            alert(currentLang === 'ar' ? 'تم إرسال النتيجة للمعلم بنجاح!' : 'Result sent to teacher successfully!');
+        })
+        .catch((error) => {
+            status.textContent = currentLang === 'ar' ? '❌ فشل الإرسال' : '❌ Failed to send';
+            status.style.color = '#dc2626';
+            btn.disabled = false;
+            btn.textContent = currentLang === 'ar' ? '📧 حاول مرة أخرى' : '📧 Try Again';
+            alert(currentLang === 'ar' ? 'فشل الإرسال: ' + error.text : 'Failed: ' + error.text);
+        });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const saved = loadState();
+    if (saved && saved.seed) {
+        currentSeed = saved.seed;
+        currentLang = saved.lang || 'ar';
+        timeRemaining = saved.timeRemaining !== undefined ? saved.timeRemaining : TOTAL_TIME;
+        answersVisible = saved.answersVisible || false;
+        document.getElementById('btn-ar').classList.toggle('active', currentLang === 'ar');
+        document.getElementById('btn-en').classList.toggle('active', currentLang === 'en');
+        document.body.classList.toggle('en-mode', currentLang === 'en');
+    } else {
+        currentSeed = Date.now();
+    }
+    prepareShuffledExam();
+    renderExam();
+    if (saved) {
+        if (saved.studentName) document.getElementById('studentName').value = saved.studentName;
+        if (saved.studentClass) document.getElementById('studentClass').value = saved.studentClass;
+        if (saved.examDate) document.getElementById('examDate').value = saved.examDate;
+        if (saved.answers) restoreAnswers(saved.answers);
+    }
+    setupAnswerListeners();
+    setupInputListeners();
+    startTimer();
+});
+window.addEventListener('beforeunload', () => saveState(false));
+</script>
+</body>
+</html>
